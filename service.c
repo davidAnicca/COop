@@ -18,13 +18,15 @@ int stringEgal(char prim[], char altul[]){
 }
 
 int validateType(char tip[]){
+    ///verifica daca un tip este corect
     return stringEgal("teren", tip) || stringEgal("casa", tip) || stringEgal("apartament", tip);
 }
 
 int srvAdd(Service srv, char tip[], int suprafata, char adresa[], float pret){
     ///adaugă o oferta
-    ///returneaza mesajul "s-a adaugat" dacă s-a putut adăuga
-    ///altfel returnează un mesaj de eroare
+    ///returneaza mesajul 1 dacă s-a putut adăuga
+    ///-1 daca tipul e invalid
+    ///0 dacă exista deja
     if(!validateType(tip))
         return -1;
     Oferta ofertaDeAdaugat = creaza(tip, suprafata, adresa, pret);
@@ -36,6 +38,7 @@ int srvAdd(Service srv, char tip[], int suprafata, char adresa[], float pret){
 }
 
 int srvDelete(Service srv, char adresa[]){
+    //sterge. returneaza 1 daca s-a șters și 0 altfel
     Oferta ofertaDeSters = creaza("tip", 0, adresa, 0);
     if(delete(srv.repo, ofertaDeSters) == 1)
         return 1;
@@ -43,6 +46,9 @@ int srvDelete(Service srv, char adresa[]){
 }
 
 int srvModifyPrice(Service srv, char adresa[], float pretNou){
+    ///modifica pretul
+    ///returneaza 1 daca oferta există și prețul s-a putut modifica
+    ///returneaza 0 dacă oferta nu exista
     Oferta oferta = creaza("tip", 0, adresa, 0);
     Oferta gasita = cauta(*srv.repo, adresa);
     if(!egali(oferta, gasita))
@@ -58,6 +64,9 @@ int srvModifyPrice(Service srv, char adresa[], float pretNou){
 }
 
 int srvModifySurface(Service srv, char adresa[], int suprafataNoua){
+    ///modifica suprafata
+    ///returneaza 1 daca oferta există și suprafata s-a putut modifica
+    ///returneaza 0 dacă oferta nu exista
     Oferta oferta = creaza("tip", 0, adresa, 0);
     Oferta gasita = cauta(*srv.repo, adresa);
     if(!egali(oferta, gasita))
@@ -73,6 +82,10 @@ int srvModifySurface(Service srv, char adresa[], int suprafataNoua){
 }
 
 int srvModifyType(Service srv, char adresa[], char tip[]){
+    ///modifica tipul
+    ///returneaza 1 daca oferta există și suprafata s-a putut tipul
+    ///returneaza 0 dacă oferta nu exista
+    ///-1 pentru tip invalid
     if(!validateType(tip))
         return -1;
     Oferta oferta = creaza("tip", 0, adresa, 0);
