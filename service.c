@@ -1,16 +1,16 @@
 #include "repo.c"
 
-Oferta creaza(char tip[], int suprafata, char adresa[], float pret){
-    ///creează o ofertă nouă folosind informațiile din param
-    Oferta oferta;
-    setTip(&oferta, tip);
-    setAdresa(&oferta, adresa);
-    oferta.suprafata = suprafata;
-    oferta.pret = pret;
-    return oferta;
+
+
+typedef struct Services{
+    Repo *repo;
+}Service;
+
+Service createService(Repo *repo){
+    Service service;
+    service.repo = repo;
+    return service;
 }
-
-
 
 int stringEgal(char prim[], char altul[]){
     ///verifică dacă două stringuri sunt egale
@@ -21,69 +21,69 @@ int validateType(char tip[]){
     return stringEgal("teren", tip) || stringEgal("casa", tip) || stringEgal("apartament", tip);
 }
 
-char *srvAdd(char tip[], int suprafata, char adresa[], float pret){
+int srvAdd(Service srv, char tip[], int suprafata, char adresa[], float pret){
     ///adaugă o oferta
     ///returneaza mesajul "s-a adaugat" dacă s-a putut adăuga
     ///altfel returnează un mesaj de eroare
     if(!validateType(tip))
-        return "tip invalid. nu s-a efectual adaugarea";
+        return -1;
     Oferta ofertaDeAdaugat = creaza(tip, suprafata, adresa, pret);
-    if(add(ofertaDeAdaugat) == 1){
-        return "s-a adaugat";
+    if(add(srv.repo, ofertaDeAdaugat) == 1){
+        return 1;
     }else{
-        return "oferta exista deja. nu s-a efectuat adaugarea";
+        return 0;
     }
 }
 
-char *srvDelete(char adresa[]){
+int srvDelete(Service srv, char adresa[]){
     Oferta ofertaDeSters = creaza("tip", 0, adresa, 0);
-    if(delete(ofertaDeSters) == 1)
-        return "s-a sters";
-    return "oferta nu exista. nu s-a efectuat stergere";
+    if(delete(srv.repo, ofertaDeSters) == 1)
+        return 1;
+    return 0;
 }
 
-char *srvModifyPrice(char adresa[], float pretNou){
+int srvModifyPrice(Service srv, char adresa[], float pretNou){
     Oferta oferta = creaza("tip", 0, adresa, 0);
-    Oferta gasita = cauta(adresa);
+    Oferta gasita = cauta(*srv.repo, adresa);
     if(!egali(oferta, gasita))
-        return "nu exista. nu s-a efectuat modificarea";
+        return 0;
 
     setTip(&oferta, gasita.tip);
     oferta.suprafata = gasita.suprafata;
 
     //!!
     oferta.pret = pretNou;
-    modify(oferta);
-    return "s-a modificat pretul";
+    modify(srv.repo, oferta);
+    return 1;
 }
 
-char *srvModifySurface(char adresa[], int suprafataNoua){
+int srvModifySurface(Service srv, char adresa[], int suprafataNoua){
     Oferta oferta = creaza("tip", 0, adresa, 0);
-    Oferta gasita = cauta(adresa);
+    Oferta gasita = cauta(*srv.repo, adresa);
     if(!egali(oferta, gasita))
-        return "nu exista. nu s-a efectuat modificarea";
+        return 0;
 
     setTip(&oferta, gasita.tip);
     oferta.pret = gasita.pret;
 
     //!!
     oferta.suprafata = suprafataNoua;//modificarea
-    modify(oferta);
-    return "s-a modificat suprafata";
+    modify(srv.repo, oferta);
+    return 1;
 }
 
-char *srvModifyType(char adresa[], char tip[]){
+int srvModifyType(Service srv, char adresa[], char tip[]){
     if(!validateType(tip))
-        return "tip invalid. nu s-a efectuat modificarea";
+        return -1;
     Oferta oferta = creaza("tip", 0, adresa, 0);
-    Oferta gasita = cauta(adresa);
+    Oferta gasita = cauta(*srv.repo, adresa);
     if(!egali(oferta, gasita))
-        return "nu exista. nu s-a efectuat modificarea";
+        return 0;
 
     oferta.suprafata = gasita.suprafata;
     oferta.pret = gasita.pret;
     //!!
     setTip(&oferta, tip); //modificarea
-    modify(oferta);
-    return "s-a modificat tipul";
+    modify(srv.repo, oferta);
+    return 1;
 }
