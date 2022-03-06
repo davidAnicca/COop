@@ -45,3 +45,27 @@ int modify(Oferta oferta){
     }
     return 0;
 }
+
+void emptyList(){
+    //golește lista de oferte
+    while(lista.n>0) {
+        if(lista.n == 1){
+            lista.n = 0;
+            return;
+        }
+        for (int i = 0; i < lista.n - 1; i++)
+            lista.oferte[i] = lista.oferte[i+1];
+        lista.n--;
+    }
+}
+
+Oferta cauta(char adresa[]){
+    Oferta oferta;
+    setAdresa(&oferta, adresa);
+    for(int i = 0; i < lista.n; i++)
+        if(egali(lista.oferte[i], oferta))
+            return lista.oferte[i];
+    Oferta vida;
+    setAdresa(&vida, "vida");
+    return vida;
+}

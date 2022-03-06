@@ -2,6 +2,7 @@
 
 typedef struct Oferte{
     char tip[11];
+    ///(teren, casa, apartament)
     int suprafata;
     char adresa[100];
     float pret;

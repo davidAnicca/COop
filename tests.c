@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "repo.c"
+#include "service.c"
 #include <assert.h>
 
 void repoTestAdd(){
@@ -63,12 +63,79 @@ void repoTestModify(){
             assert(strcmp(alta.tip, lista.oferte[i].tip)==0);
         }
     }
+    assert(delete(ofertaDeModificat)==1);
+}
+
+void testEmpty(){
+    emptyList();
+    assert(lista.n == 0);
+}
+
+
+///services tests
+
+void servicesAdd(){
+    assert(stringEgal(srvAdd("nimicbun", 1, "a", 12),
+                      "tip invalid. nu s-a efectual adaugarea"));
+    assert(stringEgal("s-a adaugat", srvAdd("casa", 12, "adresa", 12)));
+    assert(stringEgal("oferta exista deja. nu s-a efectuat adaugarea", srvAdd("casa", 12, "adresa", 12)));
+}
+
+void servicesDelete(){
+    assert(stringEgal("s-a sters", srvDelete("adresa")));
+    for(int i = 0; i < lista.n; i++)
+        assert(!egali(lista.oferte[i], creaza("casa", 12, "adresa", 12)));
+    assert(stringEgal("oferta nu exista. nu s-a efectuat stergere", srvDelete("adresa")));
+}
+
+float myabs(float a) {
+    return a >= 0 ? a : -a;
+}
+
+void servicesModPrice(){
+    srvAdd("casa", 12, "adresa", 15.0);
+    assert(stringEgal("s-a modificat pretul", srvModifyPrice("adresa", 3.14)));
+    for(int i = 0; i < lista.n; i++){
+        if(egali(lista.oferte[i], creaza("casa", 12, "adresa", 0))){
+            assert(myabs(lista.oferte[i].pret-3.14)<0.01);
+        }
+    }
+    assert(stringEgal("nu exista. nu s-a efectuat modificarea", srvModifyPrice("in", 3.14)));
+}
+
+void servicesModSurface(){
+    assert(stringEgal("s-a modificat suprafata", srvModifySurface("adresa", 100)));
+    for(int i = 0; i < lista.n; i++){
+        if(egali(lista.oferte[i], creaza("casa", 12, "adresa", 0))){
+            assert(lista.oferte[i].suprafata == 100);
+        }
+    }
+    assert(stringEgal("nu exista. nu s-a efectuat modificarea", srvModifySurface("in", 3.14)));
+}
+
+void servicesModType(){
+    assert(stringEgal("tip invalid. nu s-a efectuat modificarea", srvModifyType("adresa", "prostie")));
+    assert(stringEgal("s-a modificat tipul", srvModifyType("adresa", "apartament")));
+    for(int i = 0; i < lista.n; i++){
+        if(egali(lista.oferte[i], creaza("casa", 12, "adresa", 0))){
+            assert(stringEgal(lista.oferte[i].tip, "apartament"));
+        }
+    }
+    assert(stringEgal("nu exista. nu s-a efectuat modificarea", srvModifyType("in", "apartament")));
 }
 
 void runAll(){
     repoTestAdd();
     repoTestDelete();
     repoTestModify();
+
+    servicesAdd();
+    servicesDelete();
+    servicesModPrice();
+    servicesModSurface();
+    servicesModType();
+
+    testEmpty();
     printf("tests end\n");
     return;
 }
